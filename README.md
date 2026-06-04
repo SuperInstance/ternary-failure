@@ -104,6 +104,20 @@ fn main() {
 - **Safety-critical system design**: Model system reliability with confidence bounds and classify MTBF against safety thresholds.
 - **Risk assessment**: Ternary risk classification for any domain where risks naturally fall into must-avoid / critical / tolerable categories.
 
+## Known Limitations
+
+- **FMEA classification thresholds are hardcoded**: `FmeaEntry::new()` classifies risk using fixed RPN thresholds: ≥200 → `Avoid`, ≤50 → `Negligible`, else `Critical`. These industry-derived thresholds are not configurable and may not match your domain's risk appetite. A critical system might need `Avoid` at RPN 100, not 200.
+
+- **Fault tree `TernaryOr` is short-circuit**: `TernaryOr` returns the first non-negligible child without evaluating the rest. This means it can miss the worst-case failure mode if children are ordered with a `Critical` before an `Avoid` event. The result depends on child ordering.
+
+- **Exponential reliability model assumes constant failure rate**: `ReliabilityModel` uses `R(t) = e^{−λt}`, which assumes failures are memoryless (constant hazard rate). Real systems have bathtub-curve failure rates (infant mortality → useful life → wear-out). The model is inaccurate during burn-in and end-of-life phases.
+
+- **Confidence bounds are symmetric multipliers, not statistical**: `mtbf_bounds()` applies fixed multipliers based on `Confidence` level (e.g., ±30% for Medium). These are not confidence intervals from a chi-squared distribution or any statistical model — they're rough engineering heuristics.
+
+- **`series_reliability()` assumes independent failures**: The product `R_system = ∏ Rᵢ` assumes component failures are statistically independent. In practice, shared environmental stresses (temperature, vibration) create correlated failures that make actual system reliability lower than predicted.
+
+- **No repair modeling**: The reliability models represent only the failure process. There is no mean time to repair (MTTR), availability calculation, or Markov model for repairable systems.
+
 ## Ecosystem
 
 Part of the **SuperInstance** ternary computing suite:
