@@ -1,0 +1,6 @@
+[package]
+name = "ternary-failure"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Failure analysis with ternary classification, FMEA risk analysis, fault trees with ternary gates, reliability modeling, and MTBF estimation"
